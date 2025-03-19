@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Medical Consultation Chatbot</title>
+  <style>
+    /* General body styling */
+    body {
+      background-color: #f0f4f8;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    /* Header styling */
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Chat container styling */
+    #chat-box {
+      width: 600px;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    
+    /* Messages container styling */
+    #messages {
+      padding: 20px;
+      height: 300px;
+      overflow-y: auto;
+      background-color: #fafafa;
+      border-bottom: 1px solid #eee;
+    }
+    
+    /* Individual message styling */
+    .message {
+      margin-bottom: 15px;
+      line-height: 1.5;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    
+    /* User messages styling */
+    .user {
+      background-color: #e1f5fe;
+      text-align: right;
+      color: #0277bd;
+    }
+    
+    /* Bot messages styling */
+    .bot {
+      background-color: #f1f8e9;
+      text-align: left;
+      color: #33691e;
+    }
+    
+    /* Chat form styling */
+    #chat-form {
+      display: flex;
+      padding: 15px;
+      background-color: #fff;
+    }
+    
+    #message {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      outline: none;
+    }
+    
+    #chat-form button {
+      padding: 10px 20px;
+      margin-left: 10px;
+      background-color: #0277bd;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+    
+    #chat-form button:hover {
+      background-color: #01579b;
+    }
+  </style>
+</head>
+<body>
+  <h1>Medical Consultation Chatbot</h1>
+  <div id="chat-box">
+    <div id="messages">
+      <!-- Display the greeting message passed from the backend -->
+      <div class="message bot">{{ greeting }}</div>
+    </div>
+    <form id="chat-form" method="post">
+      <input type="text" name="message" id="message" placeholder="Enter your question" required />
+      <button type="submit">Send</button>
+    </form>
+  </div>
+  
+  <script>
+    const form = document.getElementById("chat-form");
+    const messagesDiv = document.getElementById("messages");
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const messageInput = document.getElementById("message");
+      const userMessage = messageInput.value;
+      
+      // Display user input
+      const userMessageDiv = document.createElement("div");
+      userMessageDiv.classList.add("message", "user");
+      userMessageDiv.innerText = "You: " + userMessage;
+      messagesDiv.appendChild(userMessageDiv);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      
+      // Send request to the backend
+      fetch("/chat", {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: "message=" + encodeURIComponent(userMessage)
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Display the bot's reply
+        const botMessageDiv = document.createElement("div");
+        botMessageDiv.classList.add("message", "bot");
+        botMessageDiv.innerText = "Bot: " + data.reply;
+        messagesDiv.appendChild(botMessageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      });
+      
+      messageInput.value = "";
+    });
+  </script>
+</body>
+</html>
